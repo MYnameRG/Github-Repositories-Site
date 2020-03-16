@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta http-equiv="X-UA-Compatible" content="ie=edge">
+        <title>GitHub Repositries</title>
+    </head>
+    <body onload="onLoad()">
+        <h1>REPOSITRIES</h1>
+        <hr>
+        <div id="projects"></div>
+        <script type="text/javascript" src="getData.js"></script>
+        <script>
+            //Adding the script in 2nd Way
+            /*var imported = document.createElement('script');
+            imported.src = 'getData.js';
+            document.head.appendChild(imported);*/
+
+            var xhttp = new XMLHttpRequest();
+            var count = 0;
+
+            function addProjects(project)
+            {
+                count++;
+                let list = document.getElementById("projects");
+                let node = document.createElement("p");
+                node.style.font = "15px arial";
+                node.style.fontWeight = 700;
+                let name = document.createTextNode(count+". "+project.name);
+                node.appendChild(name);
+                list.appendChild(node);
+            }
+
+            xhttp.onreadystatechange = function()
+            {
+                if(xhttp.status == 200 && xhttp.readyState == 4)
+                {
+                    let repos = JSON.parse(xhttp.responseText);
+                    let length = repos.length;
+                    if(Array.isArray(repos))
+                    {
+                        for(let i=0;i<length;i++)
+                        {
+                            addProjects(repos[i]);
+                        }
+                    }
+                }
+            }
+            function onLoad()
+            {
+                //Using Concationation
+                /*path = path.concat(catchData());
+                path = path.concat("/repos");*/
+
+                //Using Template Litreals
+                var path = `https://api.github.com/users/${catchData()}/repos`;
+                xhttp.open("GET",path);
+                xhttp.send();
+            }
+        </script>
+    </body>
+</html>

@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link rel="stylesheets" type="text/css" href="style.css">
+    <title>GitHub Profiles</title>  
+    <script type="text/javascript" src="getData.js"></script>
+</head>
+<body>
+  <button type="button" onclick="loadDoc()" id="Doc">Get Data from Github</button>
+  <div id="header"></div>
+  <div id="users"></div>
+  <div id="buttons"></div>  
+
+  <script>  
+    //Adding the script in 2nd Way
+    /*var imported = document.createElement('script');
+    imported.src = 'getData.js';
+    document.head.appendChild(imported);*/
+  
+    var xhttp = new XMLHttpRequest();
+    var current = 5;
+    var count = 0;
+
+    /*function domCreation()
+    {
+      var text = localStorage.getItem('github');
+      var arr = JSON.parse(text);
+      //domClear();
+      for(let i=count;i<current;i++)
+      {
+        user_details(arr[i]);
+      }
+      buttonCreation();
+      localStorage.clear();      
+    }*/
+  
+    function heading()
+    {
+      let div = document.getElementById("header");
+      let node = document.createElement("h1");
+      let heading = document.createTextNode("Welcome to The GitHub Profile...");
+      node.appendChild(heading);
+      node.appendChild(document.createElement("br"));
+      node.appendChild(document.createTextNode("Please Click on The Upper Button"));
+      node.style.margin = 250;
+      node.style.marginLeft = 450;
+      div.appendChild(node);
+    }
+    heading();
+  
+    function user_details(user)
+    {
+        let node = document.createElement("p");
+        node.setAttribute("class","clearfix");
+        let image = document.createElement("img");
+        image.setAttribute("src",user.avatar_url);
+        image.setAttribute("height",100);
+        image.setAttribute("width",100);
+        image.setAttribute("align","left");
+        node.appendChild(image);
+  
+        let id = document.createElement("p");
+        let id_value = document.createTextNode(" Id : " + user.id);
+        id.appendChild(id_value);
+        node.appendChild(id);
+        
+        let name = document.createElement("p");
+        let name_value = document.createTextNode("Name : "+ user.login);
+        name.appendChild(name_value);
+        node.appendChild(name);
+        
+        let link = document.createElement("p");
+        let link_value = document.createTextNode("Profile Link : " + user.html_url);
+        link.appendChild(link_value);
+        node.appendChild(link);
+  
+        let project = document.createElement("button");
+        project.innerHTML = "Projects";
+        project.style.backgroundColor = "skyblue";
+        project.style.borderRadius = "20px";
+        openProjects(project,user.login);
+        node.appendChild(project);
+  
+        let line = document.createElement("hr");
+        node.appendChild(line);
+  
+        document.getElementById("users").appendChild(node);
+    }
+  
+    function openProjects(project,username)
+    {
+      project.addEventListener('click',
+      function(e)
+      {
+        throwData(username);
+        location.href = "repos.html";
+      });
+    }
+  
+    function buttonCreation()
+    {
+      var div = document.getElementById("buttons");
+      var prev = document.createElement("button");
+      prev.innerHTML = "Prev";
+      prev.style.backgroundColor = 'aqua';
+      div.appendChild(prev);
+      var next = document.createElement("button");
+      next.innerHTML = "Next";
+      next.style.backgroundColor = 'aqua';
+      div.appendChild(next);
+      prev.style.marginLeft = "620px";
+      listenTheEvents(prev,next);
+    }
+  
+    function listenTheEvents(prev,next)
+    {
+      prev.addEventListener('click',
+      function(e)
+      {
+        count -= 5;
+        current -= 5;
+        if(current<0 || count<0)
+        {
+          count = 0;
+          current = 5;
+        }
+        xhttp.onreadystatechange();
+      });
+  
+      next.addEventListener('click',
+      function(e)
+      {
+        count += 5;
+        current += 5;
+        xhttp.onreadystatechange();
+      });
+    }
+  
+    function domClear()
+    {
+      var header = document.getElementById("header");
+      while(header.firstChild)
+      {
+        header.removeChild(header.firstChild);
+      }
+      var users = document.getElementById("users");
+      while(users.firstChild)
+      {
+        users.removeChild(users.firstChild);
+      }
+      var buttons = document.getElementById("buttons");
+      while(buttons.firstChild)
+      {
+        buttons.removeChild(buttons.firstChild);
+      }
+    }
+  
+    // Track the state changes of the request.
+    xhttp.onreadystatechange = function() 
+    {
+        // readyState 4 means the request is done.
+        // status 200 is a successful return.
+        if (xhttp.readyState == 4 && xhttp.status == 200) 
+        {
+          //document.getElementById("users").innerHTML = xhttp.responseText; // 'This is the output.'
+          let users = JSON.parse(xhttp.responseText) ;
+          localStorage.setItem('github',xhttp.responseText);
+          let length = users.length;
+          if(Array.isArray(users) && current>0 && current<=length)
+          {
+            domClear();
+            for(let i=count;i<current;i++)
+            {
+              user_details(users[i]);
+            }
+            buttonCreation();
+          }
+        }
+        else
+        {
+            // An error occurred during the request.
+          console.log(xhttp.status) ;
+        }
+      };
+      
+    function loadDoc() 
+    {
+      domClear();
+      xhttp.open("GET", "https://api.github.com/users");
+      xhttp.send();
+    }
+    </script>  
+</body>
+</html>
